@@ -1,16 +1,51 @@
 import Link from "next/link";
 import connectMongo from "@/lib/Mongoose";
 import Blog from "@/models/Blog";
+import BlogCard from "@/components/BlogCard";
 
-export default async function BlogsPage() {
+export const revalidate = 60;
+
+type Props = {
+    searchParams: Promise<{
+        search?: string;
+        page?: string;
+    }>;
+};
+
+export default async function BlogsPage({
+    searchParams,
+}: Props) {
+
+    const { search, page } = await searchParams;
 
     await connectMongo();
 
-    const blogs = await Blog.find()
+    const currentPage = Number(page) || 1;
+    const limit = 5;
+
+    const query = search
+        ? {
+              title: {
+                  $regex: search,
+                  $options: "i",
+              },
+          }
+        : {};
+
+    const totalBlogs = await Blog.countDocuments(query);
+
+    const blogs = await Blog.find(query)
         .populate("author")
-        .sort({ createdAt: -1 });
+        .sort({
+            createdAt: -1,
+        })
+        .skip((currentPage - 1) * limit)
+        .limit(limit);
+
+    const totalPages = Math.ceil(totalBlogs / limit);
 
     return (
+
         <main className="max-w-5xl mx-auto px-6 py-10">
 
             <div className="flex justify-between items-center mb-8">
@@ -28,36 +63,83 @@ export default async function BlogsPage() {
 
             </div>
 
+            <form className="mb-8">
+
+                <input
+                    type="text"
+                    name="search"
+                    defaultValue={search}
+                    placeholder="Search blogs..."
+                    className="border rounded px-4 py-2 w-full"
+                />
+
+            </form>
+
             <div className="space-y-6">
 
-                {blogs.map((blog: any) => (
+                {blogs.length === 0 ? (
 
-                    <div
-                        key={blog._id}
-                        className="border rounded-lg p-5"
-                    >
+                    <p>No blogs found.</p>
 
-                        <Link
-                            href={`/blogs/${blog._id}`}
-                            className="text-xl font-bold hover:underline"
-                        >
-                            {blog.title}
-                        </Link>
+                ) : (
 
-                        <p className="text-gray-600 mt-2">
-                            {blog.content.substring(0, 150)}...
-                        </p>
+                    blogs.map((blog: any) => (
 
-                        <p className="text-sm mt-4">
-                            By {blog.author?.name}
-                        </p>
+                        <BlogCard
+                            key={blog._id}
+                            blog={blog}
+                        />
 
-                    </div>
+                    ))
 
-                ))}
+                )}
 
             </div>
 
+            {totalPages > 1 && (
+
+                <div className="flex justify-between mt-10">
+
+                    {currentPage > 1 ? (
+
+                        <Link
+                            href={`/blogs?page=${currentPage - 1}${search ? `&search=${search}` : ""}`}
+                            className="text-blue-500 hover:underline"
+                        >
+                            ← Previous
+                        </Link>
+
+                    ) : (
+
+                        <div />
+
+                    )}
+
+                    <span className="text-gray-500">
+                        Page {currentPage} of {totalPages}
+                    </span>
+
+                    {currentPage < totalPages ? (
+
+                        <Link
+                            href={`/blogs?page=${currentPage + 1}${search ? `&search=${search}` : ""}`}
+                            className="text-blue-500 hover:underline"
+                        >
+                            Next →
+                        </Link>
+
+                    ) : (
+
+                        <div />
+
+                    )}
+
+                </div>
+
+            )}
+
         </main>
+
     );
+
 }

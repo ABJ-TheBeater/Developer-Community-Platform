@@ -1,36 +1,230 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Developer Community Platform
 
-## Getting Started
+A full-stack developer platform built with Next.js where users can authenticate with GitHub or Google, publish blogs, join developer communities, and create public developer profiles.
 
-First, run the development server:
+This project was developed as a capstone project using Next.js App Router, MongoDB Atlas, Mongoose, NextAuth.js, TypeScript, Tailwind CSS, and Zod.
+
+---
+
+# Features
+
+- GitHub and Google OAuth authentication
+- Public developer profiles
+- Profile editing
+- Create, edit, and delete blogs
+- Browse developer communities
+- Join and leave communities
+- Search blogs
+- Search communities
+- Responsive design
+- Protected routes and API endpoints
+- Form validation using Zod
+
+---
+
+# Technologies Used
+
+- Next.js 16 (App Router)
+- React
+- TypeScript
+- Tailwind CSS
+- MongoDB Atlas
+- Mongoose
+- NextAuth.js
+- Zod
+
+---
+
+# Local Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ABJ-TheBeater/Developer-Community-Platform.git
+```
+
+Navigate into the project:
+
+```bash
+cd Developer-Community-Platform
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a `.env.local` file using the variables listed in `.env.example`.
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+# Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+Create a `.env.local` file containing:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+MONGODB_URI=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+AUTH_SECRET=
 
-## Deploy on Vercel
+AUTH_GOOGLE_ID=
+AUTH_GOOGLE_SECRET=
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+AUTH_GITHUB_ID=
+AUTH_GITHUB_SECRET=
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+NEXT_PUBLIC_APP_URL=
+```
+
+---
+
+# MongoDB Atlas Setup
+
+1. Create a MongoDB Atlas cluster.
+2. Create a database user.
+3. Allow your IP address in Network Access.
+4. Copy the connection string.
+5. Replace `<password>` with your database password.
+6. Paste the connection string into `MONGODB_URI` inside `.env.local`.
+
+---
+
+# Google OAuth Setup
+
+1. Open Google Cloud Console.
+2. Create OAuth credentials.
+3. Add the callback URL:
+
+```
+http://localhost:3000/api/auth/callback/google
+```
+
+4. Copy the Client ID and Client Secret into:
+
+```
+AUTH_GOOGLE_ID
+AUTH_GOOGLE_SECRET
+```
+
+---
+
+# GitHub OAuth Setup
+
+1. Open GitHub Developer Settings.
+2. Create a new OAuth App.
+3. Set the callback URL:
+
+```
+http://localhost:3000/api/auth/callback/github
+```
+
+4. Copy the Client ID and Client Secret into:
+
+```
+AUTH_GITHUB_ID
+AUTH_GITHUB_SECRET
+```
+
+---
+
+# Rendering Strategy
+
+The application uses multiple rendering strategies provided by Next.js.
+
+- Home page uses Server Components.
+- Blogs page uses Incremental Static Regeneration (ISR).
+- Blog details are server-rendered.
+- Communities pages are server-rendered.
+- Public profiles are server-rendered.
+- Client Components are used only for interactive features such as forms, authentication, search, and join/leave actions.
+
+---
+
+# Database Models
+
+The project uses MongoDB Atlas with Mongoose.
+
+### User
+
+Stores:
+
+- Name
+- Username
+- Email
+- Profile image
+- Headline
+- Bio
+- Skills
+- GitHub URL
+- LinkedIn URL
+
+### Blog
+
+Stores:
+
+- Title
+- Content
+- Author
+- Tags
+- Created date
+- Updated date
+
+### Community
+
+Stores:
+
+- Name
+- Slug
+- Category
+- Description
+- Members
+
+---
+
+# Security
+
+- OAuth authentication using NextAuth.js
+- Protected API routes
+- Ownership verification before editing or deleting blogs
+- Zod validation on both client and server
+- Sensitive credentials stored in environment variables
+- Duplicate community membership prevention
+
+---
+
+# Deployment
+
+Deployment URL:
+
+```
+(Add your deployed application URL here)
+```
+
+If no deployment is available, the project can be tested locally using the installation steps above.
+
+---
+
+# Test Account
+
+Authentication is performed using GitHub or Google OAuth.
+
+No default username or password is required.
+
+---
+
+# Author
+
+**Ali Jichi**

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
+import toast from "react-hot-toast";
 export default function EditDeleteButtons({
     id,
 }: {
@@ -26,13 +26,13 @@ export default function EditDeleteButtons({
         );
 
         if (response.ok) {
-
+            toast.success("Blog deleted!");
             router.push("/blogs");
             router.refresh();
 
         } else {
-
-            alert("Failed to delete blog.");
+            
+            toast.error("Failed to delete blog.");
 
         }
 

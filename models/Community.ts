@@ -8,6 +8,19 @@ const CommunitySchema = new Schema(
       trim: true,
     },
 
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+
+    category: {
+      type: String,
+      default: "General",
+      trim: true,
+    },
+
     description: {
       type: String,
       default: "",

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function EditBlogPage() {
 
@@ -68,13 +69,15 @@ export default function EditBlogPage() {
         );
 
         if (response.ok) {
+            toast.success("Blog updated!");
 
             router.push(`/blogs/${id}`);
 
             router.refresh();
 
         } else {
-
+            toast.error("Failed to update blog.");
+            
             alert("Failed to update blog.");
 
         }

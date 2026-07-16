@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
 
@@ -31,6 +31,10 @@ const Navbar = () => {
                         <li>Communities</li>
                     </Link>
 
+                    <Link href="/blogs">
+                        <li>Blogs</li>
+                    </Link>
+
                     <Link href="/topics">
                         <li>Topics</li>
                     </Link>
@@ -41,32 +45,41 @@ const Navbar = () => {
 
                     {session ? (
                         <>
-                            <li>
-                                {session.user?.name}
-                            </li>
 
-                            {session.user?.image && (
-                                <img
-                                    src={session.user.image}
-                                    alt="Profile"
-                                    className="w-8 h-8 rounded-full"
-                                />
-                            )}
+                            <Link
+                                href="/profile"
+                                className="flex items-center gap-2"
+                            >
+
+                                {session.user?.image && (
+                                    <img
+                                        src={session.user.image}
+                                        alt="Profile"
+                                        className="w-8 h-8 rounded-full"
+                                    />
+                                )}
+
+                                <span>
+                                    {session.user?.name}
+                                </span>
+
+                            </Link>
 
                             <button
-                                onClick={() => signOut()}
+                                onClick={() => signOut({ callbackUrl: "/", })}
                                 className="px-3 py-1 bg-red-500 text-white rounded cursor-pointer"
                             >
                                 Logout
                             </button>
+
                         </>
                     ) : (
-                        <button
-                            onClick={() => signIn()}
-                            className="px-3 py-1 bg-blue-600 text-white rounded cursor-pointer"
+                        <Link
+                            href="/login"
+                            className="px-3 py-1 bg-blue-600 text-white rounded"
                         >
                             Login
-                        </button>
+                        </Link>
                     )}
 
                 </ul>

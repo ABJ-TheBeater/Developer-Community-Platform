@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AuthProvider from "@/components/SessionProvider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +38,12 @@ export default function RootLayout({
           <main className="flex-1">
             {children}
           </main>
-
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 2500,
+            }}
+          />
           <Footer />
         </AuthProvider>
       </body>

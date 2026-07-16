@@ -3,29 +3,42 @@ import connectMongo from "@/lib/Mongoose";
 import User from "@/models/User";
 import Blog from "@/models/Blog";
 import Community from "@/models/Community";
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { BlogResponse, CommunityResponse,} from "@/types";
+import { notFound, redirect } from "next/navigation";
+import { CommunityResponse , BlogResponse } from "@/types";
 
-export default async function ProfilePage() {
+type Props = {
+    params: Promise<{
+        username: string;
+    }>;
+};
 
-    const session = await auth();
+export default async function PublicProfilePage({
+    params,
+}: Props) {
 
-    if (!session?.user?.email) {
-
-        redirect("/api/auth/signin");
-
-    }
+    const { username } = await params;
 
     await connectMongo();
 
+    const session = await auth();
+
     const user = await User.findOne({
-        email: session.user.email,
-    }).lean();
+        username,
+    });
 
     if (!user) {
 
-        redirect("/api/auth/signin");
+        notFound();
+
+    }
+
+    if (
+        session?.user?.email &&
+        session.user.email === user.email
+    ) {
+
+        redirect("/profile");
 
     }
 
@@ -43,41 +56,33 @@ export default async function ProfilePage() {
 
         <main className="max-w-5xl mx-auto px-6 py-10">
 
-            <div className="flex flex-col md:flex-row gap-8 items-start">
+            <div className="flex items-center gap-5">
 
-                {user.image ? (
+                {user.image && (
 
                     <img
                         src={user.image}
                         alt={user.name}
-                        className="w-32 h-32 rounded-full border border-white/20"
+                        className="w-24 h-24 rounded-full"
                     />
-
-                ) : (
-
-                    <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center text-5xl font-bold">
-
-                        {user.name.charAt(0)}
-
-                    </div>
 
                 )}
 
-                <div className="flex-1">
+                <div>
 
-                    <h1 className="text-4xl font-bold">
+                    <h1 className="text-3xl font-bold">
                         {user.name}
                     </h1>
 
-                    <p className="text-gray-400">
-                        {user.email}
+                    <p>
+                        @{user.username}
                     </p>
 
-                    <p className="mt-3">
+                    <p className="mt-2">
                         {user.headline || "Developer"}
                     </p>
 
-                    <p className="mt-3">
+                    <p className="mt-2">
                         {user.bio || "No bio yet."}
                     </p>
 
@@ -106,16 +111,16 @@ export default async function ProfilePage() {
 
                         </div>
 
-                    )}
+                    )} 
 
                     {user.github && (
 
-                        <p className="mt-4">
+                        <p className="mt-2">
 
                             <strong>GitHub:</strong>{" "}
 
                             <a
-                                href={`https://${user.github.replace(/^https?:\/\//, "")}`}
+                                href={user.github}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-500 hover:underline"
@@ -134,7 +139,7 @@ export default async function ProfilePage() {
                             <strong>LinkedIn:</strong>{" "}
 
                             <a
-                                href={`https://${user.linkedin.replace(/^https?:\/\//, "")}`}
+                                href={user.linkedin}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-500 hover:underline"
@@ -146,67 +151,19 @@ export default async function ProfilePage() {
 
                     )}
 
-                    <div className="flex gap-3 mt-6">
-
-                        <Link
-                            href="/profile/edit"
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
-                        >
-                            Edit Profile
-                        </Link>
-
-                        <Link
-                            href="/blogs/new"
-                            className="border border-white/20 px-5 py-2 rounded-lg hover:bg-white/10"
-                        >
-                            Create Blog
-                        </Link>
-
-                    </div>
-
                 </div>
 
             </div>
 
-            <div className="grid grid-cols-2 gap-6 mt-12 max-w-sm">
-
-                <div className="text-center border border-white/10 rounded-xl p-5">
-
-                    <p className="text-4xl font-bold">
-                        {blogs.length}
-                    </p>
-
-                    <p className="text-gray-400 mt-2">
-                        Blogs
-                    </p>
-
-                </div>
-
-                <div className="text-center border border-white/10 rounded-xl p-5">
-
-                    <p className="text-4xl font-bold">
-                        {communities.length}
-                    </p>
-
-                    <p className="text-gray-400 mt-2">
-                        Communities
-                    </p>
-
-                </div>
-
-            </div>
-
-            <section className="mt-14">
+            <div className="mt-12">
 
                 <h2 className="text-2xl font-bold mb-5">
-                    Joined Communities
+                    Communities
                 </h2>
 
                 {communities.length === 0 ? (
 
-                    <p className="text-gray-400">
-                        You haven't joined any communities yet.
-                    </p>
+                    <p>This developer hasn't joined any communities yet.</p>
 
                 ) : (
 
@@ -217,7 +174,7 @@ export default async function ProfilePage() {
                             <Link
                                 key={community._id}
                                 href={`/communities/${community.slug}`}
-                                className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-full transition"
+                                className="bg-blue-700 text-white px-4 py-2 rounded-full hover:bg-blue-800"
                             >
                                 {community.name}
                             </Link>
@@ -228,49 +185,47 @@ export default async function ProfilePage() {
 
                 )}
 
-            </section>
+            </div>
 
-            <section className="mt-14">
+            <div className="mt-12">
 
                 <h2 className="text-2xl font-bold mb-5">
-                    My Blogs
+                    Blogs
                 </h2>
 
-                {blogs.length === 0 ? (
+                <div className="space-y-4">
 
-                    <p className="text-gray-400">
-                        You haven't written any blogs yet.
-                    </p>
+                    {blogs.length === 0 ? (
 
-                ) : (
+                        <p>No blogs yet.</p>
 
-                    <div className="space-y-4">
+                    ) : (
 
-                        {blogs.map((blog: any) => (
+                        blogs.map((blog: BlogResponse) => (
 
                             <Link
                                 key={blog._id}
                                 href={`/blogs/${blog._id}`}
-                                className="block border border-white/10 rounded-xl p-5 hover:bg-white/5 transition"
+                                className="block border rounded-xl p-4 hover:bg-white/10 transition"
                             >
 
-                                <h3 className="text-xl font-semibold">
+                                <h3 className="font-bold text-lg">
                                     {blog.title}
                                 </h3>
 
-                                <p className="text-gray-400 mt-3">
+                                <p className="text-gray-400 mt-2">
                                     {blog.content.substring(0, 120)}...
                                 </p>
 
                             </Link>
 
-                        ))}
+                        ))
 
-                    </div>
+                    )}
 
-                )}
+                </div>
 
-            </section>
+            </div>
 
         </main>
 

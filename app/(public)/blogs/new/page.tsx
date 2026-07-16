@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function NewBlogPage() {
 
@@ -39,12 +40,12 @@ export default function NewBlogPage() {
         });
 
         if (response.ok) {
-
+            toast.success("Blog created!");
             router.push("/blogs");
 
         } else {
 
-            alert("Failed to create blog.");
+            toast.error("Failed to create blog.");
 
         }
 

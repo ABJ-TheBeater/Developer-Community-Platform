@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function EditProfilePage() {
 
@@ -12,6 +13,7 @@ export default function EditProfilePage() {
     const [bio, setBio] = useState("");
     const [github, setGithub] = useState("");
     const [linkedin, setLinkedin] = useState("");
+    const [skills, setSkills] = useState("");
 
     useEffect(() => {
 
@@ -26,6 +28,7 @@ export default function EditProfilePage() {
             setBio(data.bio || "");
             setGithub(data.github || "");
             setLinkedin(data.linkedin || "");
+            setSkills(data.skills?.join(", ") || "");
 
         }
 
@@ -57,19 +60,24 @@ export default function EditProfilePage() {
                     github,
                     linkedin,
 
+                    skills: skills
+                        .split(",")
+                        .map(skill => skill.trim())
+                        .filter(skill => skill !== ""),
+
                 }),
 
             }
         );
 
         if (response.ok) {
-
+            toast.success("Profile updated!");
             router.push("/profile");
             router.refresh();
 
         } else {
 
-            alert("Failed to update profile.");
+            toast.error("Failed to update profile.");
 
         }
 
@@ -131,6 +139,15 @@ export default function EditProfilePage() {
                         setLinkedin(e.target.value)
                     }
                     placeholder="LinkedIn URL"
+                    className="w-full border rounded p-3"
+                />
+
+                <input
+                    value={skills}
+                    onChange={(e) =>
+                        setSkills(e.target.value)
+                    }
+                    placeholder="Skills (React, Next.js, MongoDB)"
                     className="w-full border rounded p-3"
                 />
 

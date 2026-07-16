@@ -87,6 +87,7 @@ export async function PATCH(
                     bio: validated.bio,
                     github: validated.github,
                     linkedin: validated.linkedin,
+                    skills: validated.skills || [],
                 },
 
                 {
