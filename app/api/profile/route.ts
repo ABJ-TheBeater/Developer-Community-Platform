@@ -3,6 +3,7 @@ import connectMongo from "@/lib/Mongoose";
 import User from "@/models/User";
 import { auth } from "@/auth";
 import { profileSchema } from "@/schemas/profileSchema";
+import { ZodError } from "zod";
 
 export async function GET() {
 
@@ -102,12 +103,23 @@ export async function PATCH(
         );
 
     } catch (error) {
+        if (error instanceof ZodError) {
+            return NextResponse.json(
+                {
+                    error: error.issues[0].message,
+                },
+                { status: 400 }
+            );
+        }
+
+        console.error(error);
 
         return NextResponse.json(
-            { error: "Failed to update profile" },
+            {
+                error: "Failed to update profile",
+            },
             { status: 500 }
         );
-
     }
 
 }

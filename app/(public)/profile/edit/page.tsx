@@ -69,7 +69,7 @@ export default function EditProfilePage() {
 
             }
         );
-
+        const data = await response.json();
         if (response.ok) {
             toast.success("Profile updated!");
             router.push("/profile");
@@ -77,7 +77,7 @@ export default function EditProfilePage() {
 
         } else {
 
-            toast.error("Failed to update profile.");
+            toast.error(data.error);
 
         }
 
